@@ -23,7 +23,7 @@ def process_message(_):
     while '42/user' not in conn.recv():
         pass
     else:
-        conn.send(f'42/user,')
+        conn.send('42/user,')
     while True:
         conn.send('2')
         conn.recv()
