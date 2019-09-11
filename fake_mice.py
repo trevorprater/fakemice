@@ -10,12 +10,12 @@ from websocket import create_connection
 NUM_FAKE_VIEWERS = 1000
 
 WEBSOCKET_CONN_URI = 'wss://micerace.com/socket.io/?EIO=3&transport=websocket'
-SSLOPT = {'cert_reqs': ssl.CERT_NONE}
+SSL_OPT = {'cert_reqs': ssl.CERT_NONE}
 
 
-@retry(Exception, tries=4, delay=1, backoff=1, jitter=1)
+@retry(Exception, tries=2, delay=2, backoff=1, jitter=1)
 def process_message(_):
-    conn = create_connection(WEBSOCKET_CONN_URI, sslopt=SSLOPT)
+    conn = create_connection(WEBSOCKET_CONN_URI, sslopt=SSL_OPT)
     conn.recv()
     conn.send(f'40/chat,')
     conn.send(f'40/user,')
@@ -25,18 +25,13 @@ def process_message(_):
     else:
         conn.send(f'42/user,')
     while True:
-        send_ping(conn)
+        conn.send('2')
+        conn.recv()
         time.sleep(20)
 
 
-def send_ping(conn):
-    conn.send('2')
-    conn.recv()
-
-
 def main():
-    pool = Pool(NUM_FAKE_VIEWERS)
-    for _ in enumerate(pool.imap_unordered(process_message, range(NUM_FAKE_VIEWERS))):
+    for _ in Pool(NUM_FAKE_VIEWERS).imap_unordered(process_message, range(NUM_FAKE_VIEWERS)):
         pass
 
 
