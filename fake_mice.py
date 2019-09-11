@@ -17,11 +17,11 @@ SSL_OPT = {'cert_reqs': ssl.CERT_NONE}
 def process_message(_):
     conn = create_connection(WEBSOCKET_CONN_URI, sslopt=SSL_OPT)
     conn.recv()
-    conn.send(f'40/chat,')
-    conn.send(f'40/user,')
-    v = conn.recv()
-    while '42/user' not in v:
-        v = conn.recv()
+    conn.send('40/chat,')
+    conn.send('40/user,')
+
+    while '42/user' not in conn.recv():
+        pass
     else:
         conn.send(f'42/user,')
     while True:
